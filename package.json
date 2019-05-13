@@ -1,0 +1,70 @@
+{
+  "name": "mobx-cognito",
+  "version": "1.0.0",
+  "description": "Browser module for AWS Cognito functionality tied to a MobX State",
+  "main": "lib/index.js",
+  "browser": "lib/index.js",
+  "scripts": {
+    "start": "babel -s inline -d lib -w src",
+    "build": "babel -s inline -d lib src",
+    "prepublish": "npm test && npm run build",
+    "test": "ava",
+    "test-watch": "ava --watch",
+    "coverage": "nyc ava"
+  },
+  "keywords": [
+    "mobx",
+    "aws",
+    "cognito"
+  ],
+  "author": "Michael Bauer",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/polyfill": "^7.4.3",
+    "amazon-cognito-identity-js": "^3.0.11",
+    "aws-sdk": "^2.437.0",
+    "core-js": "^3.0.1",
+    "mobx": "^5.9.4"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
+    "@babel/plugin-proposal-decorators": "^7.4.0",
+    "@babel/preset-env": "^7.4.3",
+    "@babel/register": "^7.4.0",
+    "ava": "^1.4.1",
+    "aws-sdk-mock": "^4.4.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.12.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-config-prettier": "^3.4.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.2",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-react": "^7.13.0",
+    "mock-require": "^3.0.3",
+    "nyc": "^14.0.0",
+    "randomstring": "^1.1.5",
+    "sinon": "^7.3.2",
+    "uuid": "^3.3.2"
+  },
+  "ava": {
+    "files": [
+      "tests/**/*.test.js"
+    ],
+    "require": [
+      "@babel/register"
+    ]
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.js"
+    ],
+    "exclude": [
+      "lib/**",
+      "**/*.test.js",
+      "tests/**/*.js"
+    ]
+  }
+}
