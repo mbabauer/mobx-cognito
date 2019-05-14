@@ -44,6 +44,29 @@ test("Can login", t => {
   t.is(cut.loginState, LOGIN_STATES.LOGGED_IN);
 });
 
+test("Can logout", t => {
+  const cut = new AuthStateStore();
+  sinon.stub(cut, "getUserPool").callsFake(() => new MockedUserPool());
+  sinon
+    .stub(cut, "getCognitoUser")
+    .callsFake(userData => new MockedUser(userData));
+
+  cut.configure(mockedConfig);
+  cut.signIn(fakeVals.fakeUsername, fakeVals.fakePassword);
+
+  // Confirm we are in "LOGGED_IN" state
+  t.is(cut.loginState, LOGIN_STATES.LOGGED_IN);
+
+  cut.signOut();
+
+  // Confirm we are not in "SIGN_IN" state
+  // Confirm we are in "LOGGED_IN" state
+  t.is(cut.userSession, null);
+  t.is(cut.accessToken, null);
+  t.is(cut.idToken, null);
+  t.is(cut.loginState, LOGIN_STATES.SIGN_IN);
+});
+
 test("Can login with MFA", t => {
   const cut = new AuthStateStore();
   sinon.stub(cut, "getUserPool").callsFake(() => new MockedUserPool());
@@ -60,6 +83,36 @@ test("Can login with MFA", t => {
   cut.confirmMFA(fakeVals.fakeMFA);
 
   // Confirm we are in "LOGGED_IN" state
+  t.not(cut.userSession, undefined);
+  t.not(cut.userSession, null);
+  t.not(cut.accessToken, undefined);
+  t.not(cut.accessToken, null);
+  t.is(typeof cut.accessToken.getJwtToken, "function");
+  t.is(cut.accessToken.getJwtToken(), fakeVals.fakeJwtToken);
+  t.not(cut.idToken, undefined);
+  t.not(cut.idToken, null);
+  t.is(cut.idToken.jwtToken, fakeVals.fakeJwtToken);
+  t.is(cut.loginState, LOGIN_STATES.LOGGED_IN);
+});
+
+test("Can handle New Password Required", t => {
+  const cut = new AuthStateStore();
+  sinon.stub(cut, "getUserPool").callsFake(() => new MockedUserPool());
+  sinon
+    .stub(cut, "getCognitoUser")
+    .callsFake(
+      userData => new MockedUser(userData, { triggerNewPasswordRequired: true })
+    );
+
+  cut.configure(mockedConfig);
+  cut.signIn(fakeVals.fakeUsername, fakeVals.fakePassword);
+
+  // Confirm we are in "MFA" state
+  t.is(cut.loginState, LOGIN_STATES.NEW_PASSWORD);
+
+  cut.completeNewPasswordChallenge("newPassword", { fakeAttr: "fakeAttr1" });
+
+  // Config we can set the new password
   t.not(cut.userSession, undefined);
   t.not(cut.userSession, null);
   t.not(cut.accessToken, undefined);

@@ -65,6 +65,10 @@
       "lib/**",
       "**/*.test.js",
       "tests/**/*.js"
+    ],
+    "reporter": [
+      "text",
+      "html"
     ]
   }
 }

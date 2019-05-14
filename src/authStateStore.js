@@ -18,12 +18,25 @@ class AuthStateStore {
   configuration = null;
   userPool = null;
 
+  handlers = {
+    onSuccess: result => this.handleOnSuccessLogin(result),
+    onFailure: err => this.handleOnFailureLogin(err),
+    mfaRequired: codeDeliveryDetails =>
+      this.handleMFARequired(codeDeliveryDetails),
+    newPasswordRequired: (userAttributes, requiredAttributes) =>
+      this.handleNewPassword(userAttributes, requiredAttributes)
+  };
+
   @observable userSession = null;
   @observable cognitoUser = null;
   @observable loginState = LOGIN_STATES.SIGN_IN;
   @observable loginError = null;
   @observable accessToken = null;
   @observable idToken = null;
+
+  // These are only set when a new password is required
+  @observable userAttributes = null;
+  @observable requiredAttributes = null;
 
   /**
    * Sets configuration for Cognito
@@ -54,6 +67,7 @@ class AuthStateStore {
   /**
    * Lazy-initializes the CognitoUser
    * @param {Object} userData The UserData
+   * @returns {Object} The CognitoUser object
    */
   getCognitoUser(userData) {
     if (!this.cognitoUser) this.cognitoUser = new CognitoUser(userData);
@@ -77,6 +91,17 @@ class AuthStateStore {
     this.setLoginState(LOGIN_STATES.MFA);
   }
 
+  handleNewPassword(userAttributes, requiredAttributes) {
+    this.userAttributes = userAttributes;
+    this.requiredAttributes = requiredAttributes;
+    this.setLoginState(LOGIN_STATES.NEW_PASSWORD);
+  }
+
+  /**
+   * Authenticates the given user
+   * @param {string} username The username
+   * @param {string} password The password
+   */
   @action signIn(username, password) {
     const authenticationData = { Username: username, Password: password };
     const userData = {
@@ -85,21 +110,40 @@ class AuthStateStore {
       ...this.configuration.Storage
     };
     const authenticationDetails = new AuthenticationDetails(authenticationData);
-    this.getCognitoUser(userData).authenticateUser(authenticationDetails, {
-      onSuccess: result => this.handleOnSuccessLogin(result),
-      onFailure: err => this.handleOnFailureLogin(err),
-      mfaRequired: codeDeliveryDetails =>
-        this.handleMFARequired(codeDeliveryDetails)
-    });
+    this.getCognitoUser(userData).authenticateUser(
+      authenticationDetails,
+      this.handlers
+    );
   }
 
+  /**
+   * Signs the current user out
+   */
+  @action
+  signOut() {
+    const user = this.getCognitoUser();
+    if (user) user.signOut();
+    this.userSession = null;
+    this.accessToken = null;
+    this.idToken = null;
+    this.loginError = null;
+    this.setLoginState(LOGIN_STATES.SIGN_IN);
+  }
+
+  /**
+   * Confirms the MFA code to continue the authentication proceedure
+   * @param {string} code The MFA code
+   */
   @action confirmMFA(code) {
-    this.getCognitoUser().sendMFACode(code, {
-      onSuccess: result => this.handleOnSuccessLogin(result),
-      onFailure: err => this.handleOnFailureLogin(err),
-      mfaRequired: codeDeliveryDetails =>
-        this.handleMFARequired(codeDeliveryDetails)
-    });
+    this.getCognitoUser().sendMFACode(code, this.handlers);
+  }
+
+  @action completeNewPasswordChallenge(newPassword, attributesData) {
+    this.getCognitoUser().completeNewPasswordChallenge(
+      newPassword,
+      attributesData,
+      this.handlers
+    );
   }
 
   @action setLoginState = newState => {

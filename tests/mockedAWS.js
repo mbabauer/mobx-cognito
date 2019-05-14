@@ -113,6 +113,14 @@ class MockedUser {
     config = config || {};
     this.userData = userData;
     this.triggerMFA = config.triggerMFA || false;
+    this.triggerNewPasswordRequired =
+      config.triggerNewPasswordRequired || false;
+    this.userAttributes = config.userAttributes || {};
+    this.requiredAttributes = config.requiredAttributes || {};
+
+    this.username = fakeVals.fakeUsername;
+    this.password = fakeVals.fakePassword;
+    this.attributes = {};
   }
   authenticateUser(authDetails, args) {
     if (typeof args.onSuccess !== "function")
@@ -120,17 +128,23 @@ class MockedUser {
     else if (typeof args.onFailure !== "function")
       throw new TypeError("onFailure callback required.");
     else if (
-      authDetails.username != fakeVals.fakeUsername ||
-      authDetails.password != fakeVals.fakePassword
+      authDetails.username != this.username ||
+      authDetails.password != this.password
     )
       args.onFailure(new Error("Incorrect username or password"));
     else {
       if (this.triggerMFA) {
         args.mfaRequired({});
+      } else if (this.triggerNewPasswordRequired) {
+        args.newPasswordRequired(this.userAttributes, this.requiredAttributes);
       } else {
         args.onSuccess(new MockUserSession());
       }
     }
+  }
+
+  signOut() {
+    /* Doesn't really need to do anything */
   }
 
   sendMFACode(code, args) {
@@ -140,6 +154,18 @@ class MockedUser {
       throw new TypeError("onFailure callback required.");
     else if (code != fakeVals.fakeMFA)
       args.onFailure(new Error("Incorrect MFA Code"));
+    else {
+      args.onSuccess(new MockUserSession());
+    }
+  }
+
+  completeNewPasswordChallenge(newPassword, attributesData, args) {
+    this.password = newPassword;
+    this.attributes = attributesData;
+    if (typeof args.onSuccess !== "function")
+      throw new TypeError("onSuccess callback required.");
+    else if (typeof args.onFailure !== "function")
+      throw new TypeError("onFailure callback required.");
     else {
       args.onSuccess(new MockUserSession());
     }
