@@ -6,7 +6,7 @@ This library consists of a MobX application store with functions to allow the in
 
 ## Installation
 Install `mobx-cognito` using NPM
-	`npm install  --save mbabauer/mobx-cognito`
+	`npm install  --save mobx-cognito`
 
 Import the app store into your project and include it in your React app
 ```javascript
