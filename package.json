@@ -1,6 +1,6 @@
 {
   "name": "mobx-cognito",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Browser module for AWS Cognito functionality tied to a MobX State",
   "homepage": "https://www.npmjs.com/package/mobx-cognito",
   "repository": {
