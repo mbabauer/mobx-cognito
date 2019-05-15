@@ -1,7 +1,15 @@
 {
   "name": "mobx-cognito",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Browser module for AWS Cognito functionality tied to a MobX State",
+  "homepage": "https://www.npmjs.com/package/mobx-cognito",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mbabauer/mobx-cognito"
+  },
+  "bugs": {
+    "url": "https://github.com/mbabauer/mobx-cognito/issues"
+  },
   "main": "lib/index.js",
   "browser": "lib/index.js",
   "scripts": {
