@@ -2,7 +2,7 @@
 An NPM module to allow AWS Cognito calls using a MobX app store.
 
 ## About
-This library consists of a MobX application store with functions to allow the interactions with AWS Cognito.  It allows developers to maintain the user state within their application using a MobX.
+This library consists of a MobX application store with functions to allow the interactions with AWS Cognito.  It allows developers to maintain the user state within their application using a MobX state store.
 
 ## Installation
 Install `mobx-cognito` using NPM
