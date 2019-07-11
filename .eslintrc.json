@@ -1,0 +1,9 @@
+{
+  "parser": "babel-eslint",
+  "plugins": ["import", "jsx-a11y", "promise", "react", "eslint-plugin-prettier"],
+  "extends": ["airbnb", "airbnb-base", "prettier"],
+  "rules": {
+    "prettier/prettier": "error",
+    "lines-between-class-members": [2, "always", { "exceptAfterSingleLine": true }]
+  }
+}

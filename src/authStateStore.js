@@ -1,17 +1,13 @@
-import { observable, action } from "mobx";
-import {
-  CognitoUserPool,
-  AuthenticationDetails,
-  CognitoUser
-} from "amazon-cognito-identity-js";
+import { observable, action } from 'mobx';
+import { CognitoUserPool, AuthenticationDetails, CognitoUser } from 'amazon-cognito-identity-js';
 
 const LOGIN_STATES = {
-  SIGN_IN: "signIn",
-  LOADING: "loading",
-  MFA: "mfa",
-  LOGGED_IN: "loggedIn",
-  NEW_PASSWORD: "newPassword",
-  FAILED_LOGIN: "loginFailed"
+  SIGN_IN: 'signIn',
+  LOADING: 'loading',
+  MFA: 'mfa',
+  LOGGED_IN: 'loggedIn',
+  NEW_PASSWORD: 'newPassword',
+  FAILED_LOGIN: 'loginFailed',
 };
 
 class AuthStateStore {
@@ -21,10 +17,9 @@ class AuthStateStore {
   handlers = {
     onSuccess: result => this.handleOnSuccessLogin(result),
     onFailure: err => this.handleOnFailureLogin(err),
-    mfaRequired: codeDeliveryDetails =>
-      this.handleMFARequired(codeDeliveryDetails),
+    mfaRequired: codeDeliveryDetails => this.handleMFARequired(codeDeliveryDetails),
     newPasswordRequired: (userAttributes, requiredAttributes) =>
-      this.handleNewPassword(userAttributes, requiredAttributes)
+      this.handleNewPassword(userAttributes, requiredAttributes),
   };
 
   @observable userSession = null;
@@ -46,11 +41,12 @@ class AuthStateStore {
   configure(config) {
     this.configuration = {
       UserPoolId: config.UserPoolId,
-      ClientId: config.ClientId
+      ClientId: config.ClientId,
     };
     if (config.CookieStorage) {
+      // eslint-disable-next-line no-undef
       this.configuration.Storage = new AmazonCognitoIdentity.CookieStorage({
-        ...config.CookieStorage
+        ...config.CookieStorage,
       });
     }
   }
@@ -87,6 +83,7 @@ class AuthStateStore {
     this.loginError = err;
   }
 
+  // eslint-disable-next-line no-unused-vars
   handleMFARequired(codeDeliveryDetails) {
     this.setLoginState(LOGIN_STATES.MFA);
   }
@@ -107,13 +104,10 @@ class AuthStateStore {
     const userData = {
       Username: username,
       Pool: this.getUserPool(),
-      ...this.configuration.Storage
+      ...this.configuration.Storage,
     };
     const authenticationDetails = new AuthenticationDetails(authenticationData);
-    this.getCognitoUser(userData).authenticateUser(
-      authenticationDetails,
-      this.handlers
-    );
+    this.getCognitoUser(userData).authenticateUser(authenticationDetails, this.handlers);
   }
 
   /**
@@ -139,11 +133,7 @@ class AuthStateStore {
   }
 
   @action completeNewPasswordChallenge(newPassword, attributesData) {
-    this.getCognitoUser().completeNewPasswordChallenge(
-      newPassword,
-      attributesData,
-      this.handlers
-    );
+    this.getCognitoUser().completeNewPasswordChallenge(newPassword, attributesData, this.handlers);
   }
 
   @action setLoginState = newState => {

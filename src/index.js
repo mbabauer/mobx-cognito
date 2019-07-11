@@ -1,4 +1,4 @@
-import AuthStateStore, { LOGIN_STATES } from "./authStateStore";
+import AuthStateStore, { LOGIN_STATES } from './authStateStore';
 
 const authStore = new AuthStateStore();
 
