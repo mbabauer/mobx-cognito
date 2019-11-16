@@ -85,4 +85,4 @@ A `const` containing the following possible `loginState`s:
 This software is provided as Open Source, and as such comes with no warrantees or guarantees.  Please read the License information below for more details.
 
 ## License
-[MIT](https://github.com/Availity/react-block-ui/blob/HEAD/LICENSE)
+[MIT](https://github.com/mbabauer/mobx-cognito/blob/master/LICENSE.md)
